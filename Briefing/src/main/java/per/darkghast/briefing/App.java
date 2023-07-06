@@ -39,7 +39,6 @@ public class App {
         String relativeUrl = search(cookies, headers);
         String absoluteUrl = urlDecode(relativeUrl);
         File newsPicture = getPicture(absoluteUrl, cookies, headers);
-        UpdateCheckUtil.checkIsUpdate(newsPicture);
         log.info("新闻已更新，size={}", newsPicture.length());
     }
 
@@ -86,7 +85,7 @@ public class App {
      * @param html HTML文本
      * @return 最新文章的相对URL
      */
-    public static String parseHtml(String html) {
+    public static String parseHtml(String html) throws IOException {
         Document doc = Jsoup.parse(html);
 
         List<Element> elementList = doc.select("a")
@@ -98,7 +97,11 @@ public class App {
             log.error("结果为空，请检查{}公众号的状态", PUBLIC_ACCOUNT_NAME);
             throw new PublicAccountUndefinedException("结果为空，请检查{}公众号的状态");
         } else {
-            return elementList.get(0).attr("href");
+            Element element = elementList.get(0);
+            // 新闻版本 简报(X月X日)
+            String version = ReUtil.findAll("简报\\(\\d+月\\d+日\\)", element.toString(), 0, new ArrayList<>()).get(0);
+            UpdateCheckUtil.checkIsUpdate(version);
+            return element.attr("href");
         }
     }
 
@@ -109,7 +112,7 @@ public class App {
      * @param headers 请求头
      * @return 最新文章的相对路径
      */
-    private static String search(List<HttpCookie> cookies, Map<String, String> headers) {
+    private static String search(List<HttpCookie> cookies, Map<String, String> headers) throws IOException {
         HttpRequest request = HttpRequest.get(URL)
                 .headerMap(headers, false)
                 .cookie(cookies)

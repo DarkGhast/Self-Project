@@ -3,7 +3,6 @@ package per.darkghast.briefing.util;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
-import cn.hutool.crypto.digest.DigestUtil;
 import per.darkghast.briefing.exception.NewNotUpdateException;
 
 import java.io.File;
@@ -21,23 +20,21 @@ public class UpdateCheckUtil {
     /**
      * 检查是否已经更新
      *
-     * @param file 新闻图片文件
+     * @param version 新闻版本 简报(X月X日)
      */
-    public static void checkIsUpdate(File file) throws IOException {
+    public static void checkIsUpdate(String version) throws IOException {
         if (!FileUtil.isFile(HASH_FILE)) {
             FileUtil.touch(HASH_FILE);
         }
         File recordFile = FileUtil.file(HASH_FILE);
 
-        String newHash = DigestUtil.md5Hex(file);
-
         FileReader fileReader = new FileReader(recordFile);
-        String oldHash = fileReader.readString();
-        if (newHash.equals(oldHash)) {
+        String oldVersion= fileReader.readString();
+        if (version.equals(oldVersion)) {
             throw new NewNotUpdateException("新闻未更新");
         } else {
             try (FileWriter writer = new FileWriter(recordFile)) {
-                writer.write(newHash);
+                writer.write(version);
             }
         }
     }
