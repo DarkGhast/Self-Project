@@ -1,2 +1,18 @@
 /Briefing/target/
-/.idea/
+HELP.md
+target/
+localtest/
+.http
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IntelliJ IDEA ###
+.idea
+.idea/
+.mvn
+*.iws
+*.iml
+*.ipr
+mvnw.*
+mvnw
